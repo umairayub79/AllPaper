@@ -3,6 +3,7 @@ package codes.umair.wallbox.activities;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import android.os.Bundle;
 
@@ -34,6 +35,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         rv = (RecyclerView) findViewById(R.id.rv);
+        // set a StaggeredGridLayoutManager with 3 number of columns and vertical orientation
+        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(3, LinearLayoutManager.VERTICAL);
+        rv.setLayoutManager(staggeredGridLayoutManager); // set LayoutManager to RecyclerView
 
         map.put("key", "13645069-e2a9dcafe9782433c1a9c88d3");
         map.put("q", "cats");
@@ -48,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
                 List<Post> hits = postList.getPosts();
                 adapter = new ImageListAdapter(getApplicationContext(),hits);
                 rv.setAdapter(adapter);
-                rv.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
             }
 
             @Override
