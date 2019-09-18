@@ -22,7 +22,7 @@ import codes.umair.wallbox.models.Post;
  Created by Umair Ayub on 17 Sept 2019.
  */
 
-public class   ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.PostViewHolder> {
+public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.PostViewHolder> {
     private Context context;
     private List<Post> hits;
 
@@ -42,6 +42,7 @@ public class   ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Po
     public void onBindViewHolder(PostViewHolder holder, int position) {
         Post hit = hits.get(position);
         Glide.with(context).load(hit.getWebformatURL()).fitCenter().into(holder.image);
+
     }
 
     @Override
@@ -67,6 +68,7 @@ public class   ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Po
             super(itemView);
             image = (ImageView) itemView.findViewById(R.id.image);
             cv = (CardView) itemView.findViewById(R.id.cv);
+
         }
     }
 }
