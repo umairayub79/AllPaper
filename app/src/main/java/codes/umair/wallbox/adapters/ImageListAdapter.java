@@ -46,6 +46,16 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Post
     }
 
     @Override
+    public int getItemViewType(int position) {
+        return super.getItemViewType(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return super.getItemId(position);
+    }
+
+    @Override
     public int getItemCount() {
         return hits.size();
     }

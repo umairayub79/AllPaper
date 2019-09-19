@@ -21,6 +21,9 @@ public class Post {
     @SerializedName("previewWidth")
     @Expose
     private int previewWidth;
+    @SerializedName("previewHeight")
+    @Expose
+    private int previewHeight;
     @SerializedName("downloads")
     @Expose
     private int downloads;
@@ -67,6 +70,19 @@ public class Post {
         this.likes = likes;
     }
 
+    /**
+     * @return The previewHeight
+     */
+    public int getPreviewHeight() {
+        return previewHeight;
+    }
+
+    /**
+     * @param previewHeight The previewHeight
+     */
+    public void setPreviewHeight(int previewHeight) {
+        this.previewHeight = previewHeight;
+    }
 
     /**
      * @return The tags

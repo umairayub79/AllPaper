@@ -6,10 +6,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.OrientationHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
@@ -44,14 +43,24 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         rv = (RecyclerView) findViewById(R.id.rv);
 
-        // set a StaggeredGridLayoutManager with 3 number of columns and vertical orientation
-        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(3, LinearLayoutManager.VERTICAL);
-        rv.setLayoutManager(staggeredGridLayoutManager); // set LayoutManager to RecyclerView
+//        // set a StaggeredGridLayoutManager with 3 number of columns and vertical orientation
+//        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(3, LinearLayoutManager.VERTICAL);
+//        rv.setLayoutManager(staggeredGridLayoutManager); // set LayoutManager to RecyclerView
 
+        StaggeredGridLayoutManager manager = new StaggeredGridLayoutManager(3, OrientationHelper.VERTICAL);
+        manager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
+        rv.setLayoutManager(manager);
+        //after you set this, you'll find there is a blank at the top when you scroll to the top. continue to set this
 
+        rv.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                ((StaggeredGridLayoutManager) recyclerView.getLayoutManager()).invalidateSpanAssignments();
+            }
+        });
         map.put("key", "13645069-e2a9dcafe9782433c1a9c88d3");
         map.put("q", "wallpaper");
-        map.put("per_page", "150");
         map.put("orientation", "vertical");
         map.put("image_type", "all");
 
@@ -70,13 +79,15 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<PostList> call, Throwable t) {
-                    Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                    Snackbar snackbar = Snackbar
+                            .make(rv, "Error requesting server, Please try again later", Snackbar.LENGTH_INDEFINITE);
+                    snackbar.show();
                 }
             });
         } else {
             rv.setVisibility(View.INVISIBLE);
             Snackbar snackbar = Snackbar
-                    .make(rv, "NO INTERNET CONNECTION>>>", Snackbar.LENGTH_INDEFINITE);
+                    .make(rv, "No connection", Snackbar.LENGTH_INDEFINITE);
             snackbar.show();
         }
     }
