@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.OrientationHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
     APIInterface apiInterface;
     RecyclerView rv;
+    SwipeRefreshLayout mSwipeRefresher;
     ImageListAdapter adapter;
     HashMap<String, String> map = new HashMap<>();
 
@@ -42,15 +44,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         rv = (RecyclerView) findViewById(R.id.rv);
-
-//        // set a StaggeredGridLayoutManager with 3 number of columns and vertical orientation
-//        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(3, LinearLayoutManager.VERTICAL);
-//        rv.setLayoutManager(staggeredGridLayoutManager); // set LayoutManager to RecyclerView
+        mSwipeRefresher = (SwipeRefreshLayout) findViewById(R.id.mSwipeRefresh);
 
         StaggeredGridLayoutManager manager = new StaggeredGridLayoutManager(3, OrientationHelper.VERTICAL);
         manager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
         rv.setLayoutManager(manager);
-        //after you set this, you'll find there is a blank at the top when you scroll to the top. continue to set this
 
         rv.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -60,36 +58,60 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         map.put("key", "13645069-e2a9dcafe9782433c1a9c88d3");
-        map.put("q", "wallpaper");
-        map.put("orientation", "vertical");
+        map.put("q", "cats");
         map.put("image_type", "all");
-
-
         if (isNetworkAvailable()) {
-            apiInterface = APIClient.getClient().create(APIInterface.class);
-            Call<PostList> call = apiInterface.getImageResults(map);
-            call.enqueue(new Callback<PostList>() {
-                @Override
-                public void onResponse(Call<PostList> call, Response<PostList> response) {
-                    PostList postList = response.body();
-                    List<Post> hits = postList.getPosts();
-                    adapter = new ImageListAdapter(getApplicationContext(), hits);
-                    rv.setAdapter(adapter);
-                }
-
-                @Override
-                public void onFailure(Call<PostList> call, Throwable t) {
-                    Snackbar snackbar = Snackbar
-                            .make(rv, "Error requesting server, Please try again later", Snackbar.LENGTH_INDEFINITE);
-                    snackbar.show();
-                }
-            });
+            LoadImages();
         } else {
+            mSwipeRefresher.setRefreshing(false);
             rv.setVisibility(View.INVISIBLE);
             Snackbar snackbar = Snackbar
-                    .make(rv, "No connection", Snackbar.LENGTH_INDEFINITE);
+                    .make(rv, "No connection, Try Again", Snackbar.LENGTH_INDEFINITE);
             snackbar.show();
         }
+
+        mSwipeRefresher.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if (isNetworkAvailable()) {
+                    LoadImages();
+                } else {
+                    mSwipeRefresher.setRefreshing(false);
+                    rv.setVisibility(View.INVISIBLE);
+                    Snackbar snackbar = Snackbar
+                            .make(rv, "No connection, Try Again", Snackbar.LENGTH_INDEFINITE);
+                    snackbar.show();
+                }
+            }
+        });
+
+
+    }
+
+    public void LoadImages() {
+        mSwipeRefresher.setRefreshing(true);
+        apiInterface = APIClient.getClient().create(APIInterface.class);
+        Call<PostList> call = apiInterface.getImageResults(map);
+        call.enqueue(new Callback<PostList>() {
+            @Override
+            public void onResponse(Call<PostList> call, Response<PostList> response) {
+                PostList postList = response.body();
+                List<Post> hits = postList.getPosts();
+                adapter = new ImageListAdapter(getApplicationContext(), hits);
+                rv.setAdapter(adapter);
+                rv.setVisibility(View.VISIBLE);
+                mSwipeRefresher.setRefreshing(false);
+            }
+
+            @Override
+            public void onFailure(Call<PostList> call, Throwable t) {
+                Snackbar snackbar = Snackbar
+                        .make(rv, "Error requesting server, Please try again", Snackbar.LENGTH_INDEFINITE);
+                snackbar.show();
+                mSwipeRefresher.setRefreshing(false);
+            }
+        });
+
     }
 
     private boolean isNetworkAvailable() {
