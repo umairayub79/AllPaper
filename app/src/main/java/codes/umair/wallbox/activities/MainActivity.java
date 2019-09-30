@@ -4,9 +4,13 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -43,8 +47,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        rv = findViewById(R.id.rv);
-        mSwipeRefresher = findViewById(R.id.mSwipeRefresh);
+        rv = (RecyclerView) findViewById(R.id.rv);
+        mSwipeRefresher = (SwipeRefreshLayout) findViewById(R.id.mSwipeRefresh);
         root = findViewById(R.id.root);
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
@@ -53,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         rv.setItemAnimator(new DefaultItemAnimator());
 
         if (isNetworkAvailable()) {
-            LoadImages();
+            LoadImages("");
         } else {
             mSwipeRefresher.setRefreshing(false);
             rv.setVisibility(View.INVISIBLE);
@@ -66,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onRefresh() {
                 if (isNetworkAvailable()) {
-                    LoadImages();
+                    LoadImages("");
                 } else {
                     mSwipeRefresher.setRefreshing(false);
                     rv.setVisibility(View.INVISIBLE);
@@ -79,14 +83,16 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void LoadImages() {
+    public void LoadImages(String query) {
 
         HashMap<String, String> map = new HashMap<>();
 
         map.put("key", "13645069-e2a9dcafe9782433c1a9c88d3");
         map.put("orientation", "vertical");
         map.put("per_page", "200");
-
+        if (!query.equals("")){
+            map.put("q", query);
+        }
         mSwipeRefresher.setRefreshing(true);
         apiInterface = APIClient.getClient().create(APIInterface.class);
         Call<PostList> call = apiInterface.getImageResults(map);
@@ -119,4 +125,26 @@ public class MainActivity extends AppCompatActivity {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
+
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.main_menu, menu);
+
+            MenuItem searchItem = menu.findItem(R.id.action_search);
+            SearchView searchView = (SearchView) searchItem.getActionView();
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    LoadImages(query);
+                    return true;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newQuery) {
+                    return true;
+                }
+            });
+        return true;
+    }
 }

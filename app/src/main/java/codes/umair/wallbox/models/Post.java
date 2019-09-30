@@ -142,7 +142,6 @@ public class Post {
     public int getWebformatHeight() {
         return webformatHeight;
     }
-
     /**
      * @return The webformatWidth
      */

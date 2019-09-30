@@ -35,6 +35,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Post
     public PostViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.hit_item, parent, false);
+        ;
         return new PostViewHolder(itemView);
     }
 
@@ -77,8 +78,8 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Post
 
         public PostViewHolder(View itemView) {
             super(itemView);
-            image = itemView.findViewById(R.id.image);
-            cv = itemView.findViewById(R.id.cv);
+            image = (ImageView) itemView.findViewById(R.id.image);
+            cv = (CardView) itemView.findViewById(R.id.cv);
 
         }
     }
