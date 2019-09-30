@@ -34,15 +34,16 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Post
     @Override
     public PostViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.hit_item, parent, false);;
+                .inflate(R.layout.hit_item, parent, false);
         return new PostViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(PostViewHolder holder, int position) {
+//        RequestOptions requestOptions = new RequestOptions()
+//                .placeholder(R.drawable.ic_launcher_background);
         Post hit = hits.get(position);
-        Glide.with(context).load(hit.getWebformatURL()).fitCenter().into(holder.image);
-
+        Glide.with(context).load(hit.getPreviewURL()).into(holder.image);
     }
 
     @Override
@@ -60,24 +61,24 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Post
         return hits.size();
     }
 
-    public void addItem(Post hit){
+    public void addItem(Post hit) {
         hits.add(hit);
         notifyDataSetChanged();
     }
 
-    public void addItems(List<Post> hits){
+    public void addItems(List<Post> hits) {
         hits.addAll(hits);
         notifyDataSetChanged();
     }
 
-    class PostViewHolder extends RecyclerView.ViewHolder{
+    class PostViewHolder extends RecyclerView.ViewHolder {
         public CardView cv;
         public ImageView image;
 
         public PostViewHolder(View itemView) {
             super(itemView);
-            image = (ImageView) itemView.findViewById(R.id.image);
-            cv = (CardView) itemView.findViewById(R.id.cv);
+            image = itemView.findViewById(R.id.image);
+            cv = itemView.findViewById(R.id.cv);
 
         }
     }

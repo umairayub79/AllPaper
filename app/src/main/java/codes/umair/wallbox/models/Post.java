@@ -21,6 +21,12 @@ public class Post {
     @SerializedName("previewWidth")
     @Expose
     private int previewWidth;
+    @SerializedName("webformatHeight")
+    @Expose
+    private int webformatHeight;
+    @SerializedName("webformatWidth")
+    @Expose
+    private int webformatWidth;
     @SerializedName("previewHeight")
     @Expose
     private int previewHeight;
@@ -54,7 +60,9 @@ public class Post {
     @SerializedName("imageHeight")
     @Expose
     private int imageHeight;
-
+    @SerializedName("imageURL")
+    @Expose
+    private int imageURL;
 
     /**
      * @return The likes
@@ -127,6 +135,28 @@ public class Post {
         this.previewWidth = previewWidth;
     }
 
+
+    /**
+     * @return The webformatHeight
+     */
+    public int getWebformatHeight() {
+        return webformatHeight;
+    }
+
+    /**
+     * @return The webformatWidth
+     */
+    public int getWebformatWidth() {
+        return webformatWidth;
+    }
+
+
+    /**
+     * @return The imageURL
+     */
+    public int getImageURL() {
+        return imageURL;
+    }
 
     /**
      * @return The downloads

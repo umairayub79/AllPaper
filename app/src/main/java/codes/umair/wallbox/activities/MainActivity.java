@@ -1,6 +1,5 @@
 package codes.umair.wallbox.activities;
 
-
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -8,9 +7,11 @@ import android.os.Bundle;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.OrientationHelper;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -33,40 +34,31 @@ public class MainActivity extends AppCompatActivity {
     APIInterface apiInterface;
     RecyclerView rv;
     SwipeRefreshLayout mSwipeRefresher;
-    ImageListAdapter adapter;
-    HashMap<String, String> map = new HashMap<>();
-
+    ConstraintLayout root;
     /*
- Created by Umair Ayub on 17 Sept 2019.
- */
+    Created by Umair Ayub on 17 Sept 2019.
+    */
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        rv = (RecyclerView) findViewById(R.id.rv);
-        mSwipeRefresher = (SwipeRefreshLayout) findViewById(R.id.mSwipeRefresh);
+        rv = findViewById(R.id.rv);
+        mSwipeRefresher = findViewById(R.id.mSwipeRefresh);
+        root = findViewById(R.id.root);
 
-        StaggeredGridLayoutManager manager = new StaggeredGridLayoutManager(3, OrientationHelper.VERTICAL);
-        manager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
-        rv.setLayoutManager(manager);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
+        gridLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        rv.setLayoutManager(gridLayoutManager);
+        rv.setItemAnimator(new DefaultItemAnimator());
 
-        rv.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                ((StaggeredGridLayoutManager) recyclerView.getLayoutManager()).invalidateSpanAssignments();
-            }
-        });
-        map.put("key", "13645069-e2a9dcafe9782433c1a9c88d3");
-        map.put("q", "cats");
-        map.put("image_type", "all");
         if (isNetworkAvailable()) {
             LoadImages();
         } else {
             mSwipeRefresher.setRefreshing(false);
             rv.setVisibility(View.INVISIBLE);
             Snackbar snackbar = Snackbar
-                    .make(rv, "No connection, Try Again", Snackbar.LENGTH_INDEFINITE);
+                    .make(rv, "No connection, Try Again", Snackbar.LENGTH_LONG);
             snackbar.show();
         }
 
@@ -79,16 +71,22 @@ public class MainActivity extends AppCompatActivity {
                     mSwipeRefresher.setRefreshing(false);
                     rv.setVisibility(View.INVISIBLE);
                     Snackbar snackbar = Snackbar
-                            .make(rv, "No connection, Try Again", Snackbar.LENGTH_INDEFINITE);
+                            .make(rv, "No connection, Try Again", Snackbar.LENGTH_LONG);
                     snackbar.show();
                 }
             }
         });
 
-
     }
 
     public void LoadImages() {
+
+        HashMap<String, String> map = new HashMap<>();
+
+        map.put("key", "13645069-e2a9dcafe9782433c1a9c88d3");
+        map.put("orientation", "vertical");
+        map.put("per_page", "200");
+
         mSwipeRefresher.setRefreshing(true);
         apiInterface = APIClient.getClient().create(APIInterface.class);
         Call<PostList> call = apiInterface.getImageResults(map);
@@ -97,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call<PostList> call, Response<PostList> response) {
                 PostList postList = response.body();
                 List<Post> hits = postList.getPosts();
-                adapter = new ImageListAdapter(getApplicationContext(), hits);
+                ImageListAdapter adapter = new ImageListAdapter(getApplicationContext(), hits);
                 rv.setAdapter(adapter);
                 rv.setVisibility(View.VISIBLE);
                 mSwipeRefresher.setRefreshing(false);
@@ -106,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<PostList> call, Throwable t) {
                 Snackbar snackbar = Snackbar
-                        .make(rv, "Error requesting server, Please try again", Snackbar.LENGTH_INDEFINITE);
+                        .make(root, "Error requesting server, Please try again", Snackbar.LENGTH_LONG);
                 snackbar.show();
                 mSwipeRefresher.setRefreshing(false);
             }
@@ -120,4 +118,5 @@ public class MainActivity extends AppCompatActivity {
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
+
 }
