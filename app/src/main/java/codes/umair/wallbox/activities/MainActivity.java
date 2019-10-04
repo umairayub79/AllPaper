@@ -1,6 +1,7 @@
 package codes.umair.wallbox.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -33,12 +34,17 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ImageListAdapter.OnItemClickListener {
 
+    public static final String EXTRA_URL = "imageUrl";
+    public static final String EXTRA_CREATOR = "creatorName";
+    public static final String EXTRA_LIKES = "likeCount";
+    public static final String EXTRA_VIEWS = "viewsCount";
     APIInterface apiInterface;
     RecyclerView rv;
     SwipeRefreshLayout mSwipeRefresher;
     ConstraintLayout root;
+    List<Post> hits;
     /*
     Created by Umair Ayub on 17 Sept 2019.
     */
@@ -47,14 +53,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        rv = (RecyclerView) findViewById(R.id.rv);
-        mSwipeRefresher = (SwipeRefreshLayout) findViewById(R.id.mSwipeRefresh);
+        rv = findViewById(R.id.rv);
+        mSwipeRefresher = findViewById(R.id.mSwipeRefresh);
         root = findViewById(R.id.root);
 
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
         gridLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         rv.setLayoutManager(gridLayoutManager);
         rv.setItemAnimator(new DefaultItemAnimator());
+
 
         if (isNetworkAvailable()) {
             LoadImages("");
@@ -87,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
 
         HashMap<String, String> map = new HashMap<>();
 
-        map.put("key", "13645069-e2a9dcafe9782433c1a9c88d3");
+        map.put("key", "13799911-62a795ec2e29137d307467722");
         map.put("orientation", "vertical");
         map.put("per_page", "200");
         if (!query.equals("")){
@@ -100,10 +107,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<PostList> call, Response<PostList> response) {
                 PostList postList = response.body();
-                List<Post> hits = postList.getPosts();
+                hits = postList.getPosts();
                 ImageListAdapter adapter = new ImageListAdapter(getApplicationContext(), hits);
                 rv.setAdapter(adapter);
                 rv.setVisibility(View.VISIBLE);
+                adapter.setOnItemClickListener(MainActivity.this);
                 mSwipeRefresher.setRefreshing(false);
             }
 
@@ -128,23 +136,36 @@ public class MainActivity extends AppCompatActivity {
 
 
     public boolean onCreateOptionsMenu(Menu menu) {
-            MenuInflater inflater = getMenuInflater();
-            inflater.inflate(R.menu.main_menu, menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
 
-            MenuItem searchItem = menu.findItem(R.id.action_search);
-            SearchView searchView = (SearchView) searchItem.getActionView();
-            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                @Override
-                public boolean onQueryTextSubmit(String query) {
-                    LoadImages(query);
-                    return true;
-                }
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                LoadImages(query);
+                return true;
+            }
 
-                @Override
-                public boolean onQueryTextChange(String newQuery) {
-                    return true;
-                }
-            });
+            @Override
+            public boolean onQueryTextChange(String newQuery) {
+                return true;
+            }
+        });
         return true;
+    }
+
+    @Override
+    public void onItemClick(int position) {
+        Intent detailIntent = new Intent(this, DetailActivity.class);
+        Post clickedItem = hits.get(position);
+
+        detailIntent.putExtra(EXTRA_URL, clickedItem.getFullHDURL());
+        detailIntent.putExtra(EXTRA_CREATOR, clickedItem.getUser());
+        detailIntent.putExtra(EXTRA_LIKES, clickedItem.getLikes());
+        detailIntent.putExtra(EXTRA_LIKES, clickedItem.getViews());
+
+        startActivity(detailIntent);
     }
 }

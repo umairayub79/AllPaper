@@ -4,15 +4,16 @@
     android:id="@+id/cv"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="5dp"
+    android:layout_margin="10dp"
     android:background="@android:color/transparent"
     app:cardElevation="20dp"
     app:cardCornerRadius="10dp">
 
     <ImageView
+        android:layout_height="wrap_content"
         android:id="@+id/image"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_gravity="center_vertical"
         android:src="@mipmap/ic_launcher" />
 
 

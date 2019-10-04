@@ -25,7 +25,19 @@ import codes.umair.wallbox.models.Post;
 public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.PostViewHolder> {
     private Context context;
     private List<Post> hits;
+    private OnItemClickListener mListener;
 
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        mListener = listener;
+    }
+
+    @Override
+    public void onBindViewHolder(PostViewHolder holder, int position) {
+//        RequestOptions requestOptions = new RequestOptions()
+//                .placeholder(R.drawable.ic_launcher_background);
+        Post hit = hits.get(position);
+        Glide.with(context).load(hit.getWebformatURL()).into(holder.image);
+    }
     public ImageListAdapter(Context context, List<Post> hits) {
         this.context = context;
         this.hits = hits;
@@ -35,16 +47,11 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Post
     public PostViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.hit_item, parent, false);
-        ;
         return new PostViewHolder(itemView);
     }
 
-    @Override
-    public void onBindViewHolder(PostViewHolder holder, int position) {
-//        RequestOptions requestOptions = new RequestOptions()
-//                .placeholder(R.drawable.ic_launcher_background);
-        Post hit = hits.get(position);
-        Glide.with(context).load(hit.getPreviewURL()).into(holder.image);
+    public interface OnItemClickListener {
+        void onItemClick(int position);
     }
 
     @Override
@@ -78,9 +85,20 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.Post
 
         public PostViewHolder(View itemView) {
             super(itemView);
-            image = (ImageView) itemView.findViewById(R.id.image);
-            cv = (CardView) itemView.findViewById(R.id.cv);
+            image = itemView.findViewById(R.id.image);
+            cv = itemView.findViewById(R.id.cv);
 
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mListener != null) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            mListener.onItemClick(position);
+                        }
+                    }
+                }
+            });
         }
     }
 }

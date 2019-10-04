@@ -21,15 +21,15 @@ public class Post {
     @SerializedName("previewWidth")
     @Expose
     private int previewWidth;
+    @SerializedName("previewHeight")
+    @Expose
+    private int previewHeight;
     @SerializedName("webformatHeight")
     @Expose
     private int webformatHeight;
     @SerializedName("webformatWidth")
     @Expose
     private int webformatWidth;
-    @SerializedName("previewHeight")
-    @Expose
-    private int previewHeight;
     @SerializedName("downloads")
     @Expose
     private int downloads;
@@ -62,8 +62,11 @@ public class Post {
     private int imageHeight;
     @SerializedName("imageURL")
     @Expose
-    private int imageURL;
+    private String imageURL;
 
+    @SerializedName("fullHDURL")
+    @Expose
+    private String fullHDURL;
     /**
      * @return The likes
      */
@@ -98,6 +101,7 @@ public class Post {
     public String getTags() {
         return tags;
     }
+
 
     /**
      * @param tags The tags
@@ -142,6 +146,7 @@ public class Post {
     public int getWebformatHeight() {
         return webformatHeight;
     }
+
     /**
      * @return The webformatWidth
      */
@@ -149,11 +154,17 @@ public class Post {
         return webformatWidth;
     }
 
+    /**
+     * @return The fullHDURL
+     */
+    public String getFullHDURL() {
+        return fullHDURL;
+    }
 
     /**
      * @return The imageURL
      */
-    public int getImageURL() {
+    public String getImageURL() {
         return imageURL;
     }
 
