@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
 
     public static final String EXTRA_URL = "imageUrl";
     public static final String EXTRA_CREATOR = "creatorName";
+    public static final String EXTRA_SIZE = "imgSize";
     public static final String EXTRA_LIKES = "likeCount";
     public static final String EXTRA_VIEWS = "viewsCount";
     APIInterface apiInterface;
@@ -163,8 +164,9 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
 
         detailIntent.putExtra(EXTRA_URL, clickedItem.getFullHDURL());
         detailIntent.putExtra(EXTRA_CREATOR, clickedItem.getUser());
+        detailIntent.putExtra(EXTRA_SIZE, "W " + clickedItem.getImageWidth() + " x H " + clickedItem.getImageHeight());
         detailIntent.putExtra(EXTRA_LIKES, clickedItem.getLikes());
-        detailIntent.putExtra(EXTRA_LIKES, clickedItem.getViews());
+        detailIntent.putExtra(EXTRA_VIEWS, clickedItem.getViews());
 
         startActivity(detailIntent);
     }

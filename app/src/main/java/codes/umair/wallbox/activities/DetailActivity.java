@@ -1,18 +1,23 @@
 package codes.umair.wallbox.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import codes.umair.wallbox.R;
 
 import static codes.umair.wallbox.activities.MainActivity.EXTRA_CREATOR;
 import static codes.umair.wallbox.activities.MainActivity.EXTRA_LIKES;
+import static codes.umair.wallbox.activities.MainActivity.EXTRA_SIZE;
 import static codes.umair.wallbox.activities.MainActivity.EXTRA_URL;
 import static codes.umair.wallbox.activities.MainActivity.EXTRA_VIEWS;
 
@@ -20,29 +25,55 @@ import static codes.umair.wallbox.activities.MainActivity.EXTRA_VIEWS;
 public class DetailActivity extends AppCompatActivity {
 
     ImageView img;
-    TextView tv_likes, tv_creator, tv_views;
+    TextView tv_likes, tv_creator, tv_views, tv_imgSize;
+    BottomSheetDialog bottomSheetDialog;
+    Button btnOpenDialog;
+    Context ctx = DetailActivity.this;
 
+    int likeCount;
+    int viewsCount;
+
+    String creatorName;
+    String imgSize;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
         img = findViewById(R.id.imageViewDetail);
-//        tv_creator = (TextView) findViewById(R.id.tv_creator);
-//        tv_likes = (TextView) findViewById(R.id.tv_likes);
-//        tv_views = (TextView) findViewById(R.id.tv_view);
+        btnOpenDialog = findViewById(R.id.btnDialog);
 
         Intent i = getIntent();
-        int likeCount = i.getIntExtra(EXTRA_LIKES, 0);
-        int viewsCount = i.getIntExtra(EXTRA_VIEWS, 0);
-        String creatorName = i.getStringExtra(EXTRA_CREATOR);
+        likeCount = i.getIntExtra(EXTRA_LIKES, 0);
+        viewsCount = i.getIntExtra(EXTRA_VIEWS, 0);
+        imgSize = i.getStringExtra(EXTRA_SIZE);
+        creatorName = i.getStringExtra(EXTRA_CREATOR);
         String imgUrl = i.getStringExtra(EXTRA_URL);
 
         Glide.with(this).load(imgUrl).centerInside().into(img);
-//        tv_views.setText("Views; " + viewsCount);
-//        tv_likes.setText("Likes: " + likeCount);
-//        tv_creator.setText(creatorName);
 
+        btnOpenDialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openDialog();
+            }
+        });
+
+    }
+
+    public void openDialog() {
+        bottomSheetDialog = new BottomSheetDialog(ctx);
+        bottomSheetDialog.setContentView(R.layout.details_dialog);
+        tv_creator = bottomSheetDialog.findViewById(R.id.tv_user);
+        tv_likes = bottomSheetDialog.findViewById(R.id.tv_likes);
+        tv_views = bottomSheetDialog.findViewById(R.id.tv_views);
+        tv_imgSize = bottomSheetDialog.findViewById(R.id.tv_imgSize);
+
+        tv_creator.setText(creatorName);
+        tv_likes.setText("❤️ " + likeCount);
+        tv_views.setText(viewsCount + " views");
+        tv_imgSize.setText("Size " + imgSize);
+        bottomSheetDialog.show();
 
     }
 }
