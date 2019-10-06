@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">AllPaper</string>
+    <string name="no_internet">Ops, we could not find an active internet connection…</string>
+    <string name="error">Ops, something is not right…</string>
+    <string name="retry">RETRY</string>
+    <string name="no_results">No results for the query :(</string>
 </resources>

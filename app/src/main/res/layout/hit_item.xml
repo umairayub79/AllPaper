@@ -3,17 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cv"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="200dp"
     android:layout_margin="10dp"
     android:background="@android:color/transparent"
     app:cardElevation="20dp"
-    app:cardCornerRadius="10dp">
+    app:cardCornerRadius="15dp">
 
     <ImageView
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:id="@+id/image"
         android:layout_width="match_parent"
-        android:layout_gravity="center_vertical"
+        android:scaleType="centerCrop"
         android:src="@mipmap/ic_launcher" />
 
 
