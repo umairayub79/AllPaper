@@ -62,7 +62,7 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     public void openDialog() {
-        bottomSheetDialog = new BottomSheetDialog(ctx);
+        bottomSheetDialog = new BottomSheetDialog(ctx, R.style.BottomSheetDialogTheme);
         bottomSheetDialog.setContentView(R.layout.details_dialog);
         tv_creator = bottomSheetDialog.findViewById(R.id.tv_user);
         tv_likes = bottomSheetDialog.findViewById(R.id.tv_likes);
@@ -70,7 +70,7 @@ public class DetailActivity extends AppCompatActivity {
         tv_imgSize = bottomSheetDialog.findViewById(R.id.tv_imgSize);
 
         tv_creator.setText(creatorName);
-        tv_likes.setText("❤️ " + likeCount);
+        tv_likes.setText(likeCount + " likes");
         tv_views.setText(viewsCount + " views");
         tv_imgSize.setText("Size " + imgSize);
         bottomSheetDialog.show();
