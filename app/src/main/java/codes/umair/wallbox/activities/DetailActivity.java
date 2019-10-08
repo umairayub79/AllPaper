@@ -27,7 +27,7 @@ public class DetailActivity extends AppCompatActivity {
     private ImageView img;
     private TextView tv_likes, tv_creator, tv_views, tv_imgSize;
     private BottomSheetDialog bottomSheetDialog;
-    private Button btnOpenDialog;
+    private Button btnOpenDialog, btnSave, btnSetAsWall;
     Context ctx = DetailActivity.this;
 
     private int likeCount;
@@ -69,11 +69,27 @@ public class DetailActivity extends AppCompatActivity {
         tv_likes = bottomSheetDialog.findViewById(R.id.tv_likes);
         tv_views = bottomSheetDialog.findViewById(R.id.tv_views);
         tv_imgSize = bottomSheetDialog.findViewById(R.id.tv_imgSize);
+        btnSave = bottomSheetDialog.findViewById(R.id.btn_save);
+        btnSetAsWall = bottomSheetDialog.findViewById(R.id.btn_setWallpaper);
 
         tv_creator.setText(creatorName);
         tv_likes.setText(likeCount + " likes");
         tv_views.setText(viewsCount + " views");
         tv_imgSize.setText("Size " + imgSize);
+
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        btnSetAsWall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
         bottomSheetDialog.show();
 
     }
