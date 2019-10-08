@@ -24,17 +24,18 @@ import static codes.umair.wallbox.activities.MainActivity.EXTRA_VIEWS;
 
 public class DetailActivity extends AppCompatActivity {
 
-    ImageView img;
-    TextView tv_likes, tv_creator, tv_views, tv_imgSize;
-    BottomSheetDialog bottomSheetDialog;
-    Button btnOpenDialog;
+    private ImageView img;
+    private TextView tv_likes, tv_creator, tv_views, tv_imgSize;
+    private BottomSheetDialog bottomSheetDialog;
+    private Button btnOpenDialog;
     Context ctx = DetailActivity.this;
 
-    int likeCount;
-    int viewsCount;
+    private int likeCount;
+    private int viewsCount;
 
-    String creatorName;
-    String imgSize;
+    private String creatorName;
+    private String imgSize;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
