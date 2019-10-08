@@ -1,17 +1,28 @@
 package codes.umair.wallbox.activities;
 
+import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.snackbar.Snackbar;
+
+import java.io.IOException;
 
 import codes.umair.wallbox.R;
 
@@ -35,6 +46,17 @@ public class DetailActivity extends AppCompatActivity {
 
     private String creatorName;
     private String imgSize;
+    private String imgUrl;
+
+    public static void setWallpaper(Context context, Bitmap bitmap) throws IOException {
+        WallpaperManager wallpaperManager = WallpaperManager.getInstance(context);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            wallpaperManager.setBitmap(bitmap, null, true);
+            return;
+        }
+        wallpaperManager.setBitmap(bitmap);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +71,7 @@ public class DetailActivity extends AppCompatActivity {
         viewsCount = i.getIntExtra(EXTRA_VIEWS, 0);
         imgSize = i.getStringExtra(EXTRA_SIZE);
         creatorName = i.getStringExtra(EXTRA_CREATOR);
-        String imgUrl = i.getStringExtra(EXTRA_URL);
+        imgUrl = i.getStringExtra(EXTRA_URL);
 
         Glide.with(this).load(imgUrl).centerInside().into(img);
 
@@ -87,10 +109,27 @@ public class DetailActivity extends AppCompatActivity {
         btnSetAsWall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Glide.with(ctx).asBitmap().load(imgUrl).into(new CustomTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        try {
+                            setWallpaper(resource);
+                            bottomSheetDialog.dismiss();
+                            Snackbar.make(btnOpenDialog, "Wallpaper Changed", Snackbar.LENGTH_LONG).show();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
 
+                    @Override
+                    public void onLoadCleared(@Nullable Drawable placeholder) {
+
+                    }
+                });
             }
         });
         bottomSheetDialog.show();
 
     }
+
 }
