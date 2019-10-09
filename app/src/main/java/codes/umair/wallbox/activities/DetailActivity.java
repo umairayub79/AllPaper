@@ -1,5 +1,6 @@
 package codes.umair.wallbox.activities;
 
+import android.Manifest;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.Intent;
@@ -22,11 +23,14 @@ import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
+import com.nabinbhandari.android.permissions.PermissionHandler;
+import com.nabinbhandari.android.permissions.Permissions;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import codes.umair.wallbox.R;
@@ -100,10 +104,28 @@ public class DetailActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Glide.with(ctx).asBitmap().load(imgUrl).into(new CustomTarget<Bitmap>() {
                     @Override
-                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                    public void onResourceReady(@NonNull final Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                         bottomSheetDialog.dismiss();
-                        Snackbar.make(btnOpenDialog, "Image Saved", Snackbar.LENGTH_LONG).show();
-                        SaveBitmap(resource);
+                        String rationale = "Please provide Storage permission to save Wallpapers.";
+                        String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
+
+                        Permissions.Options options = new Permissions.Options()
+                                .setRationaleDialogTitle("Info")
+                                .setSettingsDialogTitle("Warning");
+
+                        Permissions.check(ctx, permissions, rationale, options, new PermissionHandler() {
+                            @Override
+                            public void onGranted() {
+                                // do your task.
+                                SaveBitmap(resource);
+                            }
+
+                            @Override
+                            public void onDenied(Context context, ArrayList<String> deniedPermissions) {
+                                // permission denied, block the feature.
+                            }
+                        });
+
                     }
 
                     @Override
@@ -142,7 +164,7 @@ public class DetailActivity extends AppCompatActivity {
 
     public void SaveBitmap(Bitmap ImageBitmap) {
         String root = Environment.getExternalStorageDirectory().toString();
-        File myDir = new File(root + "/Color Wallpapers");
+        File myDir = new File(root + "/AllPaper");
         myDir.mkdirs();
 
         String timeStamp = new SimpleDateFormat("ddss").format(new Date());
@@ -157,9 +179,12 @@ public class DetailActivity extends AppCompatActivity {
             ImageBitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOut);
             fileOut.flush();
             fileOut.close();
+            Snackbar.make(btnOpenDialog, "Image Saved", Snackbar.LENGTH_LONG).show();
 
         } catch (Exception e) {
             e.printStackTrace();
+            Snackbar.make(btnOpenDialog, "Unable to Save Image", Snackbar.LENGTH_LONG).show();
+
         }
     }
 
