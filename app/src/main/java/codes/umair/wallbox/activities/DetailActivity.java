@@ -168,7 +168,7 @@ public class DetailActivity extends AppCompatActivity {
         myDir.mkdirs();
 
         String timeStamp = new SimpleDateFormat("ddss").format(new Date());
-        String fname = "ColorWallpaper_" + timeStamp + ".png";
+        String fname = "Wallpaper_" + timeStamp + ".png";
 
         File file = new File(myDir, fname);
         if (file.exists()) {
