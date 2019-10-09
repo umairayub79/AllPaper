@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -22,7 +23,11 @@ import com.bumptech.glide.request.transition.Transition;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import codes.umair.wallbox.R;
 
@@ -48,15 +53,6 @@ public class DetailActivity extends AppCompatActivity {
     private String imgSize;
     private String imgUrl;
 
-    public static void setWallpaper(Context context, Bitmap bitmap) throws IOException {
-        WallpaperManager wallpaperManager = WallpaperManager.getInstance(context);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            wallpaperManager.setBitmap(bitmap, null, true);
-            return;
-        }
-        wallpaperManager.setBitmap(bitmap);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,7 +98,19 @@ public class DetailActivity extends AppCompatActivity {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Glide.with(ctx).asBitmap().load(imgUrl).into(new CustomTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        bottomSheetDialog.dismiss();
+                        Snackbar.make(btnOpenDialog, "Image Saved", Snackbar.LENGTH_LONG).show();
+                        SaveBitmap(resource);
+                    }
 
+                    @Override
+                    public void onLoadCleared(@Nullable Drawable placeholder) {
+
+                    }
+                });
             }
         });
 
@@ -113,7 +121,7 @@ public class DetailActivity extends AppCompatActivity {
                     @Override
                     public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                         try {
-                            setWallpaper(resource);
+                            SetWallpaper(ctx, resource);
                             bottomSheetDialog.dismiss();
                             Snackbar.make(btnOpenDialog, "Wallpaper Changed", Snackbar.LENGTH_LONG).show();
                         } catch (IOException e) {
@@ -130,6 +138,39 @@ public class DetailActivity extends AppCompatActivity {
         });
         bottomSheetDialog.show();
 
+    }
+
+    public void SaveBitmap(Bitmap ImageBitmap) {
+        String root = Environment.getExternalStorageDirectory().toString();
+        File myDir = new File(root + "/Color Wallpapers");
+        myDir.mkdirs();
+
+        String timeStamp = new SimpleDateFormat("ddss").format(new Date());
+        String fname = "ColorWallpaper_" + timeStamp + ".png";
+
+        File file = new File(myDir, fname);
+        if (file.exists()) {
+            file.delete();
+        }
+        try {
+            FileOutputStream fileOut = new FileOutputStream(file);
+            ImageBitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOut);
+            fileOut.flush();
+            fileOut.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void SetWallpaper(Context context, Bitmap bitmap) throws IOException {
+        WallpaperManager wallpaperManager = WallpaperManager.getInstance(context);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            wallpaperManager.setBitmap(bitmap, null, true);
+            return;
+        }
+        wallpaperManager.setBitmap(bitmap);
     }
 
 }
