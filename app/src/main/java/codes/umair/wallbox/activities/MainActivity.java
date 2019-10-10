@@ -9,6 +9,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -219,7 +221,7 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
                 if (newQuery.equals("")) {
                     resetImageList();
                     currentQuery = newQuery;
-                    LoadImages(1, currentQuery, is_safe_search_on, result_order, result_image_type, result_category);
+                    LoadImages(1, "", is_safe_search_on, result_order, result_image_type, result_category);
                 }
                 return true;
             }
@@ -266,12 +268,69 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
         CategorySpinner = bottomSheetDialog.findViewById(R.id.image_category_spinner);
 
 
-        safeSearchSwitch.setChecked(is_safe_search_on);
+        ArrayAdapter orderAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, itemsOrder);
+        orderAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        OrderSpinner.setAdapter(orderAdapter);
 
+        OrderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                result_order = itemsOrder[i];
+                LoadImages(1, currentQuery, is_safe_search_on, result_order, result_image_type, result_category);
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+        ArrayAdapter typeAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, itemsType);
+        typeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        imageTypeSpinner.setAdapter(typeAdapter);
+
+        imageTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                result_image_type = itemsType[i];
+                LoadImages(1, currentQuery, is_safe_search_on, result_order, result_image_type, result_category);
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        ArrayAdapter categoryAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, itemsCategory);
+        categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        CategorySpinner.setAdapter(categoryAdapter);
+
+        CategorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                result_category = itemsCategory[i];
+                LoadImages(1, currentQuery, is_safe_search_on, result_order, result_image_type, result_category);
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+
+
+
+        safeSearchSwitch.setChecked(is_safe_search_on);
         safeSearchSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean state) {
                 is_safe_search_on = state;
+                LoadImages(1, currentQuery, is_safe_search_on, result_order, result_image_type, result_category);
+
 
             }
         });

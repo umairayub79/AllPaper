@@ -38,6 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:background="@android:color/white"
+            android:layout_margin="20dp"
             android:orientation="vertical">
 
             <Switch
@@ -52,17 +53,17 @@
             <Spinner
                 android:id="@+id/image_type_spinner"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="60dp" />
 
             <Spinner
                 android:id="@+id/image_order_spinner"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="60dp" />
 
             <Spinner
                 android:id="@+id/image_category_spinner"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="60dp" />
         </LinearLayout>
     </LinearLayout>
 
