@@ -2,6 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
+    android:layout_margin="20dp"
     android:background="@android:color/transparent">
 
     <LinearLayout
@@ -38,32 +39,60 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:background="@android:color/white"
-            android:layout_margin="20dp"
             android:orientation="vertical">
+
 
             <Switch
                 android:id="@+id/safe_search_switch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:checked="false"
+                android:layout_margin="5dp"
                 android:text="Safe Search"
-                android:textSize="19sp" />
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="Image Type"
+                android:textSize="17sp" />
 
             <Spinner
                 android:id="@+id/image_type_spinner"
                 android:layout_width="match_parent"
-                android:layout_height="60dp" />
+                android:layout_height="40dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="Image Order"
+                android:textSize="17sp" />
 
             <Spinner
                 android:id="@+id/image_order_spinner"
                 android:layout_width="match_parent"
-                android:layout_height="60dp" />
+                android:layout_height="40dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="Image Category"
+                android:textSize="17sp" />
 
             <Spinner
                 android:id="@+id/image_category_spinner"
                 android:layout_width="match_parent"
-                android:layout_height="60dp" />
+                android:layout_height="40dp" />
+
+            <Button
+                android:id="@+id/btn_apply"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="Apply Filters" />
         </LinearLayout>
     </LinearLayout>
 

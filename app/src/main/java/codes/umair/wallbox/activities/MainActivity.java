@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -40,6 +41,7 @@ import codes.umair.wallbox.models.PostList;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import spencerstudios.com.jetdblib.JetDB;
 
 public class MainActivity extends AppCompatActivity implements ImageListAdapter.OnItemClickListener {
 
@@ -53,27 +55,23 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
     private ScrollListener scrollListener;
     private APIInterface apiInterface;
     private RecyclerView rv;
+    private Button btnApplyFilters;
     private SwipeRefreshLayout mSwipeRefresher;
     private ArrayList<Post> hits;
     private ImageListAdapter imageListAdapter;
     private BottomSheetDialog bottomSheetDialog;
     private String currentQuery = "";
     private ConstraintLayout root;
+
     // Filter vars
-    private boolean is_safe_search_on = false;
-    private String result_image_type = "all";
-    private String result_order = "popular";
-    private String result_category = "";
-
-
     private Switch safeSearchSwitch;
-    private Spinner imageTypeSpinner;
+    private Spinner ImageTypeSpinner;
     private Spinner OrderSpinner;
     private Spinner CategorySpinner;
     private String[] itemsOrder = {"latest", "popular"};
     private String[] itemsType = {"all", "photo", "illustration", "vector"};
     private String[] itemsCategory = {"fashion", "nature", "backgrounds", "science", "education", "people", "feelings", "religion", "health", "places", "animals", "industry", "food", "computer", "sports", "transportation", "travel", "buildings", "business", "music"};
-
+    private boolean is_safe_search_on;
 
     /*
     Created by Umair Ayub on 17 Sept 2019.
@@ -85,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
         setContentView(R.layout.activity_main);
 
         initViews();
+
 
         hits = new ArrayList<>();
         rv.setHasFixedSize(true);
@@ -98,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
 
 
         if (isNetworkAvailable()) {
-            LoadImages(1, currentQuery, is_safe_search_on, result_order, result_image_type, result_category);
+            LoadImages(1, currentQuery, is_safe_search_on, JetDB.getString(ctx, "selected_order", ""), JetDB.getString(ctx, "selected_type", ""), JetDB.getString(ctx, "selected_category", ""));
 
         } else {
             initSnackbar(R.string.no_internet);
@@ -108,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
             @Override
             public void onRefresh() {
                 if (isNetworkAvailable()) {
-                    LoadImages(1, currentQuery, is_safe_search_on, result_order, result_image_type, result_category);
+                    LoadImages(1, currentQuery, is_safe_search_on, JetDB.getString(ctx, "selected_order", ""), JetDB.getString(ctx, "selected_type", ""), JetDB.getString(ctx, "selected_category", ""));
                 } else {
                     initSnackbar(R.string.no_internet);
                 }
@@ -132,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
                 if (isNetworkAvailable()) {
                     resetImageList();
                     mSwipeRefresher.setRefreshing(true);
-                    LoadImages(1, currentQuery, is_safe_search_on, result_order, result_image_type, result_category);
+                    LoadImages(1, currentQuery, is_safe_search_on, JetDB.getString(ctx, "selected_order", ""), JetDB.getString(ctx, "selected_type", ""), JetDB.getString(ctx, "selected_category", ""));
                 } else initSnackbar(R.string.no_internet);
             }
         });
@@ -188,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
             @Override
             public void onLoadMore(int page) {
                 mSwipeRefresher.setRefreshing(true);
-                LoadImages(page, currentQuery, is_safe_search_on, result_order, result_image_type, result_category);
+                LoadImages(page, currentQuery, is_safe_search_on, JetDB.getString(ctx, "selected_order", ""), JetDB.getString(ctx, "selected_type", ""), JetDB.getString(ctx, "selected_category", ""));
             }
         };
         rv.addOnScrollListener(scrollListener);
@@ -212,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
             public boolean onQueryTextSubmit(String query) {
                 resetImageList();
                 currentQuery = query;
-                LoadImages(1, currentQuery, is_safe_search_on, result_order, result_image_type, result_category);
+                LoadImages(1, currentQuery, is_safe_search_on, JetDB.getString(ctx, "selected_order", ""), JetDB.getString(ctx, "selected_type", ""), JetDB.getString(ctx, "selected_category", ""));
                 return true;
             }
 
@@ -221,7 +220,7 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
                 if (newQuery.equals("")) {
                     resetImageList();
                     currentQuery = newQuery;
-                    LoadImages(1, "", is_safe_search_on, result_order, result_image_type, result_category);
+                    LoadImages(1, "", is_safe_search_on, JetDB.getString(ctx, "selected_order", ""), JetDB.getString(ctx, "selected_type", ""), JetDB.getString(ctx, "selected_category", ""));
                 }
                 return true;
             }
@@ -263,56 +262,63 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
         bottomSheetDialog = new BottomSheetDialog(ctx, R.style.BottomSheetDialogTheme);
         bottomSheetDialog.setContentView(R.layout.filter_dialog);
         safeSearchSwitch = bottomSheetDialog.findViewById(R.id.safe_search_switch);
-        imageTypeSpinner = bottomSheetDialog.findViewById(R.id.image_type_spinner);
+        ImageTypeSpinner = bottomSheetDialog.findViewById(R.id.image_type_spinner);
         OrderSpinner = bottomSheetDialog.findViewById(R.id.image_order_spinner);
         CategorySpinner = bottomSheetDialog.findViewById(R.id.image_category_spinner);
+        btnApplyFilters = bottomSheetDialog.findViewById(R.id.btn_apply);
 
 
+        safeSearchSwitch.setChecked(is_safe_search_on);
+
+//      Adapters
         ArrayAdapter orderAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, itemsOrder);
         orderAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         OrderSpinner.setAdapter(orderAdapter);
 
-        OrderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                result_order = itemsOrder[i];
-                LoadImages(1, currentQuery, is_safe_search_on, result_order, result_image_type, result_category);
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
         ArrayAdapter typeAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, itemsType);
         typeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        imageTypeSpinner.setAdapter(typeAdapter);
-
-        imageTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                result_image_type = itemsType[i];
-                LoadImages(1, currentQuery, is_safe_search_on, result_order, result_image_type, result_category);
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
+        ImageTypeSpinner.setAdapter(typeAdapter);
 
         ArrayAdapter categoryAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, itemsCategory);
         categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         CategorySpinner.setAdapter(categoryAdapter);
 
-        CategorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+        //Really could'nt think of any better solution//////////////////////
+        for (int i = 0; i < itemsOrder.length; i++) {
+            if (itemsOrder[i].equals(JetDB.getString(ctx, "selected_order", ""))) {
+                OrderSpinner.setSelection(i);
+            }
+        }
+        for (int i = 0; i < itemsCategory.length; i++) {
+            if (itemsCategory[i].equals(JetDB.getString(ctx, "selected_category", ""))) {
+                CategorySpinner.setSelection(i);
+            }
+        }
+        for (int i = 0; i < itemsType.length; i++) {
+            if (itemsType[i].equals(JetDB.getString(ctx, "selected_type", ""))) {
+                ImageTypeSpinner.setSelection(i);
+            }
+        }
+        //////////////////////////////
+
+
+        OrderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                result_category = itemsCategory[i];
-                LoadImages(1, currentQuery, is_safe_search_on, result_order, result_image_type, result_category);
+                JetDB.putString(ctx, itemsOrder[i], "selected_order");
+            }
 
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        ImageTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                JetDB.putString(ctx, itemsType[i], "selected_type");
             }
 
             @Override
@@ -322,6 +328,17 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
         });
 
 
+        CategorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                JetDB.putString(ctx, itemsCategory[i], "selected_category");
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
 
 
         safeSearchSwitch.setChecked(is_safe_search_on);
@@ -329,13 +346,26 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean state) {
                 is_safe_search_on = state;
-                LoadImages(1, currentQuery, is_safe_search_on, result_order, result_image_type, result_category);
-
-
             }
         });
 
+        btnApplyFilters.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LoadImages(1, currentQuery, is_safe_search_on, JetDB.getString(ctx, "selected_order", ""), JetDB.getString(ctx, "selected_type", ""), JetDB.getString(ctx, "selected_category", ""));
+                bottomSheetDialog.dismiss();
+            }
+        });
         bottomSheetDialog.show();
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        JetDB.putString(ctx, "", "selected_category");
+        JetDB.putString(ctx, "", "selected_order");
+        JetDB.putString(ctx, "", "selected_type");
+
+        super.onDestroy();
     }
 }
