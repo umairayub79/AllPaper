@@ -352,8 +352,10 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
         btnApplyFilters.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                resetImageList();
                 LoadImages(1, currentQuery, is_safe_search_on, JetDB.getString(ctx, "selected_order", ""), JetDB.getString(ctx, "selected_type", ""), JetDB.getString(ctx, "selected_category", ""));
                 bottomSheetDialog.dismiss();
+
             }
         });
         bottomSheetDialog.show();
