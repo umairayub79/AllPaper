@@ -232,11 +232,15 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.action_filter) {
-//            openFilterDialog();
+            openFilterDialog();
+
+        }
+        if (item.getItemId() == R.id.action_savedWallpapers) {
             Intent intent = new Intent(ctx, SavedActivity.class);
             startActivity(intent);
 
         }
+
 
         return super.onOptionsItemSelected(item);
     }
