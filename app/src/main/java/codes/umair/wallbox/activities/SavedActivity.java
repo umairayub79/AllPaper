@@ -7,6 +7,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import codes.umair.wallbox.R;
 
+/*
+ Created by Umair Ayub on 16 Oct 2019.
+ */
 public class SavedActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
@@ -18,6 +21,5 @@ public class SavedActivity extends AppCompatActivity {
         setContentView(R.layout.activity_saved);
         recyclerView = findViewById(R.id.saved_rv);
     }
-
 
 }
