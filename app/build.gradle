@@ -35,6 +35,10 @@ dependencies {
 
     //JetDB
     implementation 'com.github.Binary-Finery:JetDB:1.0.4'
+
+    //MADialog
+    implementation 'com.github.umairayub79:MaDialog:1.3'
+
     //Retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.6.1'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.4.1'
