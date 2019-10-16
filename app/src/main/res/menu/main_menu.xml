@@ -11,7 +11,7 @@
         android:id="@+id/action_savedWallpapers"
         android:icon="@drawable/ic_save_black_24dp"
         android:title="Saved Wallpapers"
-        app:showAsAction="ifRoom|collapseActionView" />
+        app:showAsAction="never" />
     <item
         android:id="@+id/action_filter"
         android:icon="@drawable/ic_action_filter"

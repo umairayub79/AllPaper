@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
     private Spinner CategorySpinner;
     private String[] itemsOrder = {"latest", "popular"};
     private String[] itemsType = {"all", "photo", "illustration", "vector"};
-    private String[] itemsCategory = {"fashion", "nature", "backgrounds", "science", "education", "people", "feelings", "religion", "health", "places", "animals", "industry", "food", "computer", "sports", "transportation", "travel", "buildings", "business", "music"};
+    private String[] itemsCategory = {"all", "fashion", "nature", "backgrounds", "science", "education", "people", "feelings", "religion", "health", "places", "animals", "industry", "food", "computer", "sports", "transportation", "travel", "buildings", "business", "music"};
     private boolean is_safe_search_on;
 
     /*
@@ -148,7 +148,11 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
         map.put("order", result_order);
         map.put("safesearch", String.valueOf(is_safe_search_on));
         map.put("image_type", result_image_type);
-        map.put("category", result_category);
+        if (result_category.equals("all")) {
+            map.put("category", "");
+        } else {
+            map.put("category", result_category);
+        }
         if (!query.equals("")) {
             map.put("q", query);
         }

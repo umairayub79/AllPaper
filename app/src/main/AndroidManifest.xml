@@ -15,9 +15,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:label="Saved Images"
             android:name=".activities.SavedActivity"
-            android:label="Saved Images" />
+            android:parentActivityName=".activities.MainActivity"></activity>
         <activity
+            android:parentActivityName=".activities.DetailActivity"
             android:name=".activities.DetailActivity"
             android:label="Image Details" />
         <activity android:name=".activities.MainActivity">
