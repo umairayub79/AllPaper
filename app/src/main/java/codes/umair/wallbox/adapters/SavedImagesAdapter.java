@@ -60,7 +60,7 @@ public class SavedImagesAdapter extends RecyclerView.Adapter<SavedImagesAdapter.
     }
 
     // allows clicks events to be caught
-    void setClickListener(ItemClickListener itemClickListener) {
+    public void setClickListener(ItemClickListener itemClickListener) {
         this.mClickListener = itemClickListener;
     }
 
