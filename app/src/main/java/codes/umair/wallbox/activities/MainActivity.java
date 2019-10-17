@@ -13,13 +13,14 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -61,7 +62,8 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
     private ImageListAdapter imageListAdapter;
     private BottomSheetDialog bottomSheetDialog;
     private String currentQuery = "";
-    private ConstraintLayout root;
+    private LinearLayout root;
+    private TextView tvCheckSavedImages;
 
     // Filter vars
     private Switch safeSearchSwitch;
@@ -85,6 +87,13 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
         initViews();
 
 
+        tvCheckSavedImages.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(ctx, SavedActivity.class);
+                startActivity(i);
+            }
+        });
         hits = new ArrayList<>();
         rv.setHasFixedSize(true);
         GridLayoutManager mLayoutManager = new GridLayoutManager(this, 2);
@@ -98,8 +107,11 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
 
         if (isNetworkAvailable()) {
             LoadImages(1, currentQuery, is_safe_search_on, JetDB.getString(ctx, "selected_order", ""), JetDB.getString(ctx, "selected_type", ""), JetDB.getString(ctx, "selected_category", ""));
-
+            tvCheckSavedImages.setVisibility(View.GONE);
+            rv.setVisibility(View.VISIBLE);
         } else {
+            rv.setVisibility(View.GONE);
+            tvCheckSavedImages.setVisibility(View.VISIBLE);
             initSnackbar(R.string.no_internet);
         }
 
@@ -108,7 +120,11 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
             public void onRefresh() {
                 if (isNetworkAvailable()) {
                     LoadImages(1, currentQuery, is_safe_search_on, JetDB.getString(ctx, "selected_order", ""), JetDB.getString(ctx, "selected_type", ""), JetDB.getString(ctx, "selected_category", ""));
+                    tvCheckSavedImages.setVisibility(View.GONE);
+                    rv.setVisibility(View.VISIBLE);
                 } else {
+                    rv.setVisibility(View.GONE);
+                    tvCheckSavedImages.setVisibility(View.VISIBLE);
                     initSnackbar(R.string.no_internet);
                 }
             }
@@ -120,6 +136,7 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
         rv = findViewById(R.id.rv);
         mSwipeRefresher = findViewById(R.id.mSwipeRefresh);
         root = findViewById(R.id.root);
+        tvCheckSavedImages = findViewById(R.id.tv_chk_imgs);
 
     }
 
@@ -165,6 +182,8 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
             public void onResponse(Call<PostList> call, Response<PostList> response) {
                 PostList postList = response.body();
                 addImagesToList(postList);
+                tvCheckSavedImages.setVisibility(View.GONE);
+                rv.setVisibility(View.VISIBLE);
             }
 
             @Override
