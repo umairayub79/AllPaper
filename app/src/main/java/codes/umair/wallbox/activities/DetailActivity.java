@@ -1,10 +1,12 @@
 package codes.umair.wallbox.activities;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
@@ -107,65 +109,63 @@ public class DetailActivity extends AppCompatActivity {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Glide.with(ctx).asBitmap().load(imgUrl).into(new CustomTarget<Bitmap>() {
+                String rationale = "Please provide Storage permission to save Wallpapers.";
+                String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
+
+                Permissions.Options options = new Permissions.Options()
+                        .setRationaleDialogTitle("Info")
+                        .setSettingsDialogTitle("Warning");
+
+                Permissions.check(ctx, permissions, rationale, options, new PermissionHandler() {
                     @Override
-                    public void onResourceReady(@NonNull final Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                        bottomSheetDialog.dismiss();
-                        String rationale = "Please provide Storage permission to save Wallpapers.";
-                        String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
+                    public void onGranted() {
+                        // do your task.
+                        if (Util.isNetworkAvailable(ctx)) {
+                            Snackbar.make(btnOpenDialog, "Saving Wallpaper", Snackbar.LENGTH_LONG).show();
+                            bottomSheetDialog.dismiss();
 
-                        Permissions.Options options = new Permissions.Options()
-                                .setRationaleDialogTitle("Info")
-                                .setSettingsDialogTitle("Warning");
-
-                        Permissions.check(ctx, permissions, rationale, options, new PermissionHandler() {
-                            @Override
-                            public void onGranted() {
-                                // do your task.
-                                if (Util.isNetworkAvailable(ctx)) {
-                                    SaveBitmap(resource);
+                            Glide.with(ctx).asBitmap().load(imgUrl).into(new CustomTarget<Bitmap>() {
+                                @Override
+                                public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                    new AsyncTaskRunner(resource, "save").execute();
                                 }
 
-                            }
+                                @Override
+                                public void onLoadCleared(@Nullable Drawable placeholder) {
 
-                            @Override
-                            public void onDenied(Context context, ArrayList<String> deniedPermissions) {
-                                // permission denied, block the feature.
-                            }
-                        });
-
+                                }
+                            });
+                        }
                     }
 
                     @Override
-                    public void onLoadCleared(@Nullable Drawable placeholder) {
-
+                    public void onDenied(Context context, ArrayList<String> deniedPermissions) {
+                        // permission denied, block the feature.
                     }
                 });
+
             }
         });
 
         btnSetAsWall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Glide.with(ctx).asBitmap().load(imgUrl).into(new CustomTarget<Bitmap>() {
-                    @Override
-                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                        try {
-                            if (Util.isNetworkAvailable(ctx)) {
-                                Util.SetWallpaper(ctx, resource);
-                                bottomSheetDialog.dismiss();
-                                Snackbar.make(btnOpenDialog, "Wallpaper Changed", Snackbar.LENGTH_LONG).show();
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                if (Util.isNetworkAvailable(ctx)) {
+                    Snackbar.make(btnOpenDialog, "Setting Wallpaper", Snackbar.LENGTH_LONG).show();
+                    bottomSheetDialog.dismiss();
+
+                    Glide.with(ctx).asBitmap().load(imgUrl).into(new CustomTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            new AsyncTaskRunner(resource, "change").execute();
                         }
-                    }
 
-                    @Override
-                    public void onLoadCleared(@Nullable Drawable placeholder) {
+                        @Override
+                        public void onLoadCleared(@Nullable Drawable placeholder) {
 
-                    }
-                });
+                        }
+                    });
+                }
             }
         });
         bottomSheetDialog.show();
@@ -197,5 +197,59 @@ public class DetailActivity extends AppCompatActivity {
 
         }
     }
+
+
+    private class AsyncTaskRunner extends AsyncTask<Void, Void, Void> {
+
+        Bitmap bitmap;
+        String method;
+        ProgressDialog progressDialog;
+
+        public AsyncTaskRunner(Bitmap bitmap, String method) {
+            this.bitmap = bitmap;
+            this.method = method;
+        }
+
+        @Override
+        protected Void doInBackground(Void... p1) {
+            // TODO: Implement this method
+            if (method.equals("change")) {
+                try {
+                    Util.SetWallpaper(ctx, bitmap);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (method.equals("save")) {
+                SaveBitmap(bitmap);
+            }
+
+
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            if (method.equals("change")) {
+                progressDialog = ProgressDialog.show(ctx,
+                        "Just a Sec",
+                        "Changing Wallpaper");
+            }
+            if (method.equals("save")) {
+                progressDialog = ProgressDialog.show(ctx,
+                        "Just a Sec",
+                        "Saving Wallpaper");
+            }
+
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            progressDialog.dismiss();
+        }
+
+
+    }
+
 
 }
