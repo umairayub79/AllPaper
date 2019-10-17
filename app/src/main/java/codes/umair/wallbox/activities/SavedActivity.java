@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -35,6 +36,7 @@ import umairayub.madialog.MaDialogListener;
 public class SavedActivity extends AppCompatActivity implements SavedImagesAdapter.ItemClickListener {
 
     private RecyclerView recyclerView;
+    private TextView textView_noImgs;
     ArrayList<String> urlList = new ArrayList<>();
     File[] filesList;
     SavedImagesAdapter imageListAdapter;
@@ -45,6 +47,8 @@ public class SavedActivity extends AppCompatActivity implements SavedImagesAdapt
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_saved);
         recyclerView = findViewById(R.id.saved_rv);
+        textView_noImgs = findViewById(R.id.tv_chk_img);
+
 
         getImageUrlsFromSDCard();
 
@@ -55,6 +59,10 @@ public class SavedActivity extends AppCompatActivity implements SavedImagesAdapt
         imageListAdapter.setClickListener(this);
         recyclerView.setAdapter(imageListAdapter);
 
+        if (urlList.isEmpty()) {
+            textView_noImgs.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        }
     }
 
     public void getImageUrlsFromSDCard() {

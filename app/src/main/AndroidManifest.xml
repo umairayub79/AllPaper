@@ -14,14 +14,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity
             android:label="Saved Images"
             android:name=".activities.SavedActivity"
-            android:parentActivityName=".activities.MainActivity"></activity>
+            android:parentActivityName=".activities.SavedActivity" />
+
         <activity
             android:parentActivityName=".activities.DetailActivity"
             android:name=".activities.DetailActivity"
             android:label="Image Details" />
+
         <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -13,7 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
     private ImageListAdapter imageListAdapter;
     private BottomSheetDialog bottomSheetDialog;
     private String currentQuery = "";
-    private LinearLayout root;
+    private RelativeLayout root;
     private TextView tvCheckSavedImages;
 
     // Filter vars
@@ -94,6 +94,7 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
                 startActivity(i);
             }
         });
+
         hits = new ArrayList<>();
         rv.setHasFixedSize(true);
         GridLayoutManager mLayoutManager = new GridLayoutManager(this, 2);
@@ -107,8 +108,7 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
 
         if (isNetworkAvailable()) {
             LoadImages(1, currentQuery, is_safe_search_on, JetDB.getString(ctx, "selected_order", ""), JetDB.getString(ctx, "selected_type", ""), JetDB.getString(ctx, "selected_category", ""));
-            tvCheckSavedImages.setVisibility(View.GONE);
-            rv.setVisibility(View.VISIBLE);
+
         } else {
             rv.setVisibility(View.GONE);
             tvCheckSavedImages.setVisibility(View.VISIBLE);
@@ -182,8 +182,7 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
             public void onResponse(Call<PostList> call, Response<PostList> response) {
                 PostList postList = response.body();
                 addImagesToList(postList);
-                tvCheckSavedImages.setVisibility(View.GONE);
-                rv.setVisibility(View.VISIBLE);
+
             }
 
             @Override
