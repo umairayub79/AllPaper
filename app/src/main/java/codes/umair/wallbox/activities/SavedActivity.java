@@ -1,10 +1,8 @@
 package codes.umair.wallbox.activities;
 
-import android.app.WallpaperManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
@@ -27,6 +25,7 @@ import java.util.ArrayList;
 
 import codes.umair.wallbox.R;
 import codes.umair.wallbox.adapters.SavedImagesAdapter;
+import codes.umair.wallbox.utils.Util;
 import umairayub.madialog.MaDialog;
 import umairayub.madialog.MaDialogListener;
 
@@ -88,7 +87,7 @@ public class SavedActivity extends AppCompatActivity implements SavedImagesAdapt
                             @Override
                             public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                                 try {
-                                    SetWallpaper(ctx, resource);
+                                    Util.SetWallpaper(ctx, resource);
                                     Snackbar.make(recyclerView, "Wallpaper Changed", Snackbar.LENGTH_LONG).show();
                                 } catch (IOException e) {
                                     e.printStackTrace();
@@ -114,13 +113,5 @@ public class SavedActivity extends AppCompatActivity implements SavedImagesAdapt
 
     }
 
-    public void SetWallpaper(Context context, Bitmap bitmap) throws IOException {
-        WallpaperManager wallpaperManager = WallpaperManager.getInstance(context);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            wallpaperManager.setBitmap(bitmap, null, true);
-            return;
-        }
-        wallpaperManager.setBitmap(bitmap);
-    }
 }

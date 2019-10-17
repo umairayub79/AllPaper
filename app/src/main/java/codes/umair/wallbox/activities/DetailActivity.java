@@ -1,12 +1,10 @@
 package codes.umair.wallbox.activities;
 
 import android.Manifest;
-import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
@@ -34,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import codes.umair.wallbox.R;
+import codes.umair.wallbox.utils.Util;
 
 import static codes.umair.wallbox.activities.MainActivity.EXTRA_CREATOR;
 import static codes.umair.wallbox.activities.MainActivity.EXTRA_LIKES;
@@ -45,7 +44,7 @@ import static codes.umair.wallbox.activities.MainActivity.EXTRA_VIEWS;
 public class DetailActivity extends AppCompatActivity {
 
     private ImageView img;
-    private TextView tv_likes, tv_creator, tv_views, tv_imgSize;
+    private TextView tv_likes, tv_creator, tv_views, tv_imgSize, tvNoConnection;
     private BottomSheetDialog bottomSheetDialog;
     private Button btnOpenDialog, btnSave, btnSetAsWall;
     Context ctx = DetailActivity.this;
@@ -73,7 +72,13 @@ public class DetailActivity extends AppCompatActivity {
         creatorName = i.getStringExtra(EXTRA_CREATOR);
         imgUrl = i.getStringExtra(EXTRA_URL);
 
-        Glide.with(this).load(imgUrl).centerInside().into(img);
+        if (Util.isNetworkAvailable(ctx)) {
+            Glide.with(this).load(imgUrl).centerInside().into(img);
+        } else {
+            Snackbar.make(btnOpenDialog, "No Internet", Snackbar.LENGTH_LONG).show();
+
+        }
+
 
         btnOpenDialog.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -117,7 +122,10 @@ public class DetailActivity extends AppCompatActivity {
                             @Override
                             public void onGranted() {
                                 // do your task.
-                                SaveBitmap(resource);
+                                if (Util.isNetworkAvailable(ctx)) {
+                                    SaveBitmap(resource);
+                                }
+
                             }
 
                             @Override
@@ -143,9 +151,11 @@ public class DetailActivity extends AppCompatActivity {
                     @Override
                     public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                         try {
-                            SetWallpaper(ctx, resource);
-                            bottomSheetDialog.dismiss();
-                            Snackbar.make(btnOpenDialog, "Wallpaper Changed", Snackbar.LENGTH_LONG).show();
+                            if (Util.isNetworkAvailable(ctx)) {
+                                Util.SetWallpaper(ctx, resource);
+                                bottomSheetDialog.dismiss();
+                                Snackbar.make(btnOpenDialog, "Wallpaper Changed", Snackbar.LENGTH_LONG).show();
+                            }
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -186,16 +196,6 @@ public class DetailActivity extends AppCompatActivity {
             Snackbar.make(btnOpenDialog, "Unable to Save Image", Snackbar.LENGTH_LONG).show();
 
         }
-    }
-
-    public void SetWallpaper(Context context, Bitmap bitmap) throws IOException {
-        WallpaperManager wallpaperManager = WallpaperManager.getInstance(context);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            wallpaperManager.setBitmap(bitmap, null, true);
-            return;
-        }
-        wallpaperManager.setBitmap(bitmap);
     }
 
 }

@@ -2,8 +2,6 @@ package codes.umair.wallbox.activities;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -39,6 +37,7 @@ import codes.umair.wallbox.api.APIInterface;
 import codes.umair.wallbox.listener.ScrollListener;
 import codes.umair.wallbox.models.Post;
 import codes.umair.wallbox.models.PostList;
+import codes.umair.wallbox.utils.Util;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -106,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
         initScrollListener(mLayoutManager);
 
 
-        if (isNetworkAvailable()) {
+        if (Util.isNetworkAvailable(ctx)) {
             LoadImages(1, currentQuery, is_safe_search_on, JetDB.getString(ctx, "selected_order", ""), JetDB.getString(ctx, "selected_type", ""), JetDB.getString(ctx, "selected_category", ""));
 
         } else {
@@ -118,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
         mSwipeRefresher.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if (isNetworkAvailable()) {
+                if (Util.isNetworkAvailable(ctx)) {
                     LoadImages(1, currentQuery, is_safe_search_on, JetDB.getString(ctx, "selected_order", ""), JetDB.getString(ctx, "selected_type", ""), JetDB.getString(ctx, "selected_category", ""));
                     tvCheckSavedImages.setVisibility(View.GONE);
                     rv.setVisibility(View.VISIBLE);
@@ -145,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
         Snackbar snackbar = Snackbar.make(rv, messageId, Snackbar.LENGTH_INDEFINITE).setAction(R.string.retry, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isNetworkAvailable()) {
+                if (Util.isNetworkAvailable(ctx)) {
                     resetImageList();
                     mSwipeRefresher.setRefreshing(true);
                     LoadImages(1, currentQuery, is_safe_search_on, JetDB.getString(ctx, "selected_order", ""), JetDB.getString(ctx, "selected_type", ""), JetDB.getString(ctx, "selected_category", ""));
@@ -215,12 +214,6 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
         rv.addOnScrollListener(scrollListener);
     }
 
-    private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager
-                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-    }
 
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
