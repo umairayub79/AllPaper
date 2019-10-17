@@ -1,8 +1,10 @@
 package codes.umair.wallbox.activities;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
@@ -86,12 +88,9 @@ public class SavedActivity extends AppCompatActivity implements SavedImagesAdapt
                         Glide.with(ctx).asBitmap().load(urlList.get(position)).into(new CustomTarget<Bitmap>() {
                             @Override
                             public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                                try {
-                                    Util.SetWallpaper(ctx, resource);
+                                new AsyncTaskRunner().execute(resource);
                                     Snackbar.make(recyclerView, "Wallpaper Changed", Snackbar.LENGTH_LONG).show();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
+
                             }
 
                             @Override
@@ -114,4 +113,40 @@ public class SavedActivity extends AppCompatActivity implements SavedImagesAdapt
     }
 
 
+    private class AsyncTaskRunner extends AsyncTask<Bitmap, Void, Void> {
+
+        ProgressDialog progressDialog;
+
+        @Override
+        protected Void doInBackground(Bitmap... p1) {
+            // TODO: Implement this method
+
+            try {
+                Util.SetWallpaper(ctx, p1[0]);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+
+            progressDialog = ProgressDialog.show(ctx,
+                    "Just a Sec",
+                    "Changing Wallpaper");
+
+
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            progressDialog.dismiss();
+        }
+
+
+    }
 }
+
