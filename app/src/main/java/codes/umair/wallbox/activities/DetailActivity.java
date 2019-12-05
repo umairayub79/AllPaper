@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -25,6 +26,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
 import com.nabinbhandari.android.permissions.PermissionHandler;
 import com.nabinbhandari.android.permissions.Permissions;
+import com.viven.imagezoom.ImageZoomHelper;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -45,18 +47,19 @@ import static codes.umair.wallbox.activities.MainActivity.EXTRA_VIEWS;
 
 public class DetailActivity extends AppCompatActivity {
 
+    Context ctx = DetailActivity.this;
     private ImageView img;
     private TextView tv_likes, tv_creator, tv_views, tv_imgSize, tvNoConnection;
     private BottomSheetDialog bottomSheetDialog;
     private Button btnOpenDialog, btnSave, btnSetAsWall;
-    Context ctx = DetailActivity.this;
-
     private int likeCount;
     private int viewsCount;
 
     private String creatorName;
     private String imgSize;
     private String imgUrl;
+
+    private ImageZoomHelper imageZoomHelper;
 
 
     @Override
@@ -67,6 +70,8 @@ public class DetailActivity extends AppCompatActivity {
         img = findViewById(R.id.imageViewDetail);
         btnOpenDialog = findViewById(R.id.btnDialog);
 
+        imageZoomHelper = new ImageZoomHelper(this);
+        ImageZoomHelper.setViewZoomable(img);
         Intent i = getIntent();
         likeCount = i.getIntExtra(EXTRA_LIKES, 0);
         viewsCount = i.getIntExtra(EXTRA_VIEWS, 0);
@@ -75,7 +80,7 @@ public class DetailActivity extends AppCompatActivity {
         imgUrl = i.getStringExtra(EXTRA_URL);
 
         if (Util.isNetworkAvailable(ctx)) {
-            Glide.with(this).load(imgUrl).centerInside().into(img);
+            Glide.with(ctx).load(imgUrl).centerInside().into(img);
         } else {
             Snackbar.make(btnOpenDialog, "No Internet", Snackbar.LENGTH_LONG).show();
 
@@ -89,6 +94,11 @@ public class DetailActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        return imageZoomHelper.onDispatchTouchEvent(ev)||super.dispatchTouchEvent(ev);
     }
 
     public void openDialog() {
