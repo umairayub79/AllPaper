@@ -70,17 +70,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="40dp" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:text="Image Category"
-                android:textSize="17sp" />
-
-            <Spinner
-                android:id="@+id/image_category_spinner"
-                android:layout_width="match_parent"
-                android:layout_height="40dp" />
 
             <Button
                 android:id="@+id/btn_apply"

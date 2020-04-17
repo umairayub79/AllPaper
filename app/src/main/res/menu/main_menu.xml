@@ -7,15 +7,22 @@
         android:title="Search"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="ifRoom|collapseActionView" />
-    <item
-        android:id="@+id/action_savedWallpapers"
-        android:icon="@drawable/ic_save_black_24dp"
-        android:title="Saved Wallpapers"
-        app:showAsAction="never" />
+
     <item
         android:id="@+id/action_filter"
         android:icon="@drawable/ic_action_filter"
         android:title="Filter"
         app:showAsAction="ifRoom|collapseActionView" />
-
+    <item
+        android:id="@+id/action_savedWallpapers"
+        android:title="Saved Wallpapers"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_rate"
+        android:title="Rate App"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_about"
+        android:title="About"
+        app:showAsAction="never" />
 </menu>

@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
+import codes.umair.wallbox.R;
+
 public class AboutActivity extends AppCompatActivity {
 
     @Override
