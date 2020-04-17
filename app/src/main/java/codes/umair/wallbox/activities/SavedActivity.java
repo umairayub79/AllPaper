@@ -1,5 +1,6 @@
 package codes.umair.wallbox.activities;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,7 +21,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.material.snackbar.Snackbar;
+import com.nabinbhandari.android.permissions.PermissionHandler;
+import com.nabinbhandari.android.permissions.Permissions;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,7 +51,7 @@ public class SavedActivity extends AppCompatActivity implements SavedImagesAdapt
     File[] filesList;
     SavedImagesAdapter imageListAdapter;
     Context ctx = SavedActivity.this;
-
+    private AdView mAdView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,19 +60,52 @@ public class SavedActivity extends AppCompatActivity implements SavedImagesAdapt
         textView_noImgs = findViewById(R.id.tv_chk_img);
 
 
-        getImageUrlsFromSDCard();
 
 
-        GridLayoutManager mLayoutManager = new GridLayoutManager(this, 2);
-        recyclerView.setLayoutManager(mLayoutManager);
-        imageListAdapter = new SavedImagesAdapter(this, urlList);
-        imageListAdapter.setClickListener(this);
-        recyclerView.setAdapter(imageListAdapter);
+        String rationale = "Please provide Storage permission to save Wallpapers.";
+        String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
+
+        Permissions.Options options = new Permissions.Options()
+                .setRationaleDialogTitle("Info")
+                .setSettingsDialogTitle("Warning");
+
+        Permissions.check(ctx, permissions, rationale, options, new PermissionHandler() {
+            @Override
+            public void onGranted() {
+                // do your task.
+                getImageUrlsFromSDCard();
+
+                GridLayoutManager mLayoutManager = new GridLayoutManager(ctx, 2);
+                recyclerView.setLayoutManager(mLayoutManager);
+                imageListAdapter = new SavedImagesAdapter(ctx, urlList);
+                imageListAdapter.setClickListener(SavedActivity.this);
+                recyclerView.setAdapter(imageListAdapter);
+            }
+            
+            @Override
+            public void onDenied(Context context, ArrayList<String> deniedPermissions) {
+                // permission denied, block the feature.
+                Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
 
         if (urlList.isEmpty()) {
             textView_noImgs.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         }
+
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
+
+        mAdView = findViewById(R.id.adView1);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
     }
 
     public void getImageUrlsFromSDCard() {

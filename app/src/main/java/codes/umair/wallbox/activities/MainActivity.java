@@ -26,6 +26,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -76,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
     private String[] itemsType = {"all", "photo", "illustration", "vector"};
     private String[] itemsCategory = {"all", "fashion", "nature", "backgrounds", "science", "education", "people", "feelings", "religion", "health", "places", "animals", "industry", "food", "computer", "sports", "transportation", "travel", "buildings", "business", "music"};
     private boolean is_safe_search_on;
-
+    private AdView mAdView;
     /*
     Created by Umair Ayub on 17 Sept 2019.
     */
@@ -88,6 +93,16 @@ public class MainActivity extends AppCompatActivity implements ImageListAdapter.
 
         initViews();
 
+
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
+
+        mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
 
         tvCheckSavedImages.setOnClickListener(new View.OnClickListener() {
             @Override
